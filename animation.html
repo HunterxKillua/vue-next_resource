@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+   .slideshow-container {
+    width: 300px;
+    height: 300px;
+    position: relative;
+    overflow: hidden;
+  }
+  .slideshow-container-wrapper {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    width: 300%;
+    font-size: 0;
+    transform: translate(0, 0);
+    animation: scroll 10s linear infinite;
+  }
+  .slide {
+    width: 300px;
+    height: 300px;
+  }
+
+  @keyframes scroll {
+    0% {transform: translateX(0);}
+    20% { transform: translateX(0); }
+
+    30% {transform: translateX(0);}
+    40% {transform: translateX(-33.33%);}
+
+    60% { transform: translateX(-33.33%); }
+    70% { transform: translateX(-66.66%); }
+
+    90% { transform: translateX(-66.66%); }
+
+    100% {transform: translate(0,0);} /* 复位到第一张图片 */
+  }
+
+  </style>
+</head>
+<body>
+  <div class="slideshow-container">
+    <div class="slideshow-container-wrapper">
+      <img class="slide" src="image1.jpeg" />
+      <img class="slide" src="image2.jpg" />
+      <img class="slide" src="image3.jpeg" />
+    </div>
+  </div>
+
+</body>
+</html>

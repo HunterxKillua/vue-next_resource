@@ -7,13 +7,24 @@
   <title>vue3_resource</title>
   <script src="./render.js"></script>
   <script src="./data.js"></script>
+  <script src="./cache.js"></script>
+  <!-- <script src="./sort.js"></script>  -->
+  <!-- <script src="./leetcode.js"></script> -->
+  <style>
+    .border-image-clip-path {
+      position: relative;
+          width: 200px;
+          height: 100px;
+          border: 1px solid;
+          border-image: linear-gradient(45deg, gold, deeppink) 1;
+          border-radius: 10px;
+      }
+  </style>
 </head>
 <body>
   <script>
     renderElement(vdom, document.body);
   </script>
-  <div>
-    haha
-  </div>
+  <div class="border-image-clip-path"></div>
 </body>
 </html>

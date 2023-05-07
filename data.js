@@ -43,11 +43,13 @@ const reactive = (source, isShallow = false, isReadOnly) => new Proxy(source, {
       return true
     }
     const oldValue = target[key]
-    const type = Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
+    const type = Array.isArray(target)
+      ? Number(key) < target.length ? 'SET' : 'ADD'
+      : Object.prototype.hasOwnProperty.call(target, key) ? 'SET' : 'ADD'
     const res = Reflect.set(target, key, newValue, receiver)
     if (target === receiver.raw) {
       if (oldValue !== newValue && (oldValue === oldValue || newValue === newValue)) { // 后面条件为了排除NaN
-        trigger(target, key, type);
+        trigger(target, key, type, newValue);
       }
     }
     return res
@@ -69,7 +71,7 @@ const reactive = (source, isShallow = false, isReadOnly) => new Proxy(source, {
     return Reflect.has(target, key)
   },
   ownKeys(target) {
-    track(target, ITERATE_KEY)
+    track(target, Array.isArray(target) ? 'length' : ITERATE_KEY)
     return Reflect.ownKeys(target)
   }
 })
@@ -87,18 +89,35 @@ const track = (target, key) => {
   activeEffect.deps.push(deps)
 }
 
-const trigger = (target, key, type) => {
+const trigger = (target, key, type, newValue) => {
   const depsMap = bucket.get(target)
   if (!depsMap) return
   const effects = depsMap.get(key)
   const iterateEffects = depsMap.get(ITERATE_KEY)
+  const arrayEffects = depsMap.get('length')
   const effectToRun = new Set()
   effects && effects.forEach(fn => {
     if (fn !== activeEffect) {
       effectToRun.add(fn)
     }
   })
+  if (Array.isArray(target) && key === 'length') {
+    depsMap.forEach((effects, key) => {
+      if (key >= newValue) {
+        effects.forEach(fn => {
+          if (fn !== activeEffect) {
+            effectToRun.add(fn)
+          }
+        })
+      }
+    })
+  }
   if (type === 'ADD' || type === 'DELETE') {
+    arrayEffects && arrayEffects.forEach(fn => {
+      if (fn !== activeEffect) {
+        effectToRun.add(fn)
+      }
+    })
     iterateEffects && iterateEffects.forEach(fn => {
       if (fn !== activeEffect) {
         effectToRun.add(fn)
@@ -222,7 +241,12 @@ const deeps = readOnly({
   }
 })
 
+const source1 = ['foo']
+
+const arr = reactive(source1)
+
 effect(() => {
-  console.log(obj.foo)
-  console.log(deeps.foo.bar)
+  for(const key in arr) {
+    console.log(key)
+  }
 })
